@@ -1,0 +1,223 @@
+import tkinter as tk
+from tkinter import ttk
+from socket import *
+
+serverName = '127.0.0.1'
+serverPort = 8080
+message = ""
+cumulative = ""
+
+root = tk.Tk()
+root.title("v6")
+root.geometry("500x650")
+
+selected = tk.StringVar(value="POST")
+
+# 클라이언트 소켓 생성, 연결
+clientSocket = socket(AF_INET, SOCK_STREAM)
+clientSocket.connect((serverName, serverPort))
+
+def send_request():
+  # 인풋 받기
+  sentence = entry.get()
+
+  method = selected.get()
+  path_input = path_entry.get()
+  path = f"/{path_input}"
+
+  request_msg = (
+    f"{method} {path} HTTP/1.1\r\n"
+    f"Host: {serverName}\r\n"
+    f"\r\n"
+    f"{sentence}"
+  )
+
+  clientSocket.send(request_msg.encode())
+
+  response = clientSocket.recv(1024).decode()
+  header, body = response.split("\r\n\r\n", 1)
+
+  lines = header.split("\r\n")
+  response_line = lines[0]
+  version, status_code, status_phrase = response_line.split(" ", 2)
+  message = f"{status_code} {status_phrase}"
+  
+  output.config(text=message)
+  entry.delete(0, tk.END)
+  index_entry.delete(0, tk.END)
+
+def get_cumulative():
+  method = "GET"
+  path = '/'
+  global cumulative
+
+  request_msg = (
+    f"{method} {path} HTTP/1.1\r\n"
+    f"Host: {serverName}\r\n"
+    f"\r\n"
+    f""
+  )
+
+  clientSocket.send(request_msg.encode())
+
+  response = clientSocket.recv(1024).decode()
+  header, body = response.split("\r\n\r\n", 1)
+
+  lines = header.split("\r\n")
+  response_line = lines[0]
+  version, status_code, status_phrase = response_line.split(" ", 2)
+
+  if status_code == '200':
+    message = body
+  elif status_code == '404':
+    message = 'path is wrong'
+  elif status_code == '405':
+    message = 'method is wrong'
+  else:
+    message = 'sth is wrong'
+  
+  cumulative_output.delete("1.0", "end")
+  cumulative_output.insert("end", message)
+
+def on_close():
+  clientSocket.close()
+  root.destroy()
+
+
+
+
+
+
+header_title = tk.Label(root, text="Cumulative Echo", font=("Helvetica", 18, "bold"))
+header_title.pack(padx=10, pady=10, anchor="w")
+
+################################
+# 제목: header
+################################
+separator = ttk.Separator(root, orient="horizontal")
+separator.pack(fill="x")
+
+header_title = tk.Label(root, text="header")
+header_title.pack(padx=10, pady=2, anchor="w")
+
+separator = ttk.Separator(root, orient="horizontal")
+separator.pack(fill="x", pady=2)
+
+################################
+# method / path → width 절반씩
+################################
+top_frame = tk.Frame(root)
+top_frame.pack(fill="x", padx=10, pady=10)
+
+# --- method 영역 ---
+method_frame = tk.Frame(top_frame)
+method_frame.pack(side="left", expand=True, fill="both")
+
+tk.Label(method_frame, text="method를 선택하세요").pack(anchor="w")
+
+def update_index_input():
+    if selected.get() == "PUT":
+        index_entry_label.config(state="normal")
+        index_entry.config(state="normal")
+    else:
+        index_entry_label.config(state="disabled")
+        index_entry.config(state="disabled")
+
+tk.Radiobutton(method_frame, text="POST", value="POST", variable=selected, command=update_index_input).pack(anchor="w")
+tk.Radiobutton(method_frame, text="PUT",  value="PUT",  variable=selected, command=update_index_input).pack(anchor="w")
+tk.Radiobutton(method_frame, text="HEAD", value="HEAD", variable=selected, command=update_index_input).pack(anchor="w")
+tk.Radiobutton(method_frame, text="난 http를 거부하겠다",  value="hello",  variable=selected, command=update_index_input).pack(anchor="w")
+
+# --- path 영역 ---
+path_frame = tk.Frame(top_frame)
+path_frame.pack(side="left", expand=True, fill="both")
+
+tk.Label(path_frame, text="path를 입력하세요").pack(anchor="w")
+
+row = tk.Frame(path_frame)
+row.pack(anchor="w")
+
+tk.Label(row, text="/").pack(side="left")
+
+path_entry = tk.Entry(row, width=15)
+path_entry.pack(side="left")
+
+################################
+# 제목: body
+################################
+separator = ttk.Separator(root, orient="horizontal")
+separator.pack(fill="x")
+
+body_title = tk.Label(root, text="body")
+body_title.pack(padx=10, pady=2, anchor="w")
+
+separator = ttk.Separator(root, orient="horizontal")
+separator.pack(fill="x", pady=2)
+
+# 입력 텍스트
+entry_row = tk.Frame(root)
+entry_row.pack(anchor="w", padx=10)
+
+tk.Label(entry_row, text="텍스트를 입력하세요").pack(pady=10, side="left")
+entry = tk.Entry(entry_row, width=40)
+entry.pack(side="left", padx=10)
+
+# 인덱스 가로정렬
+index_row = tk.Frame(root)
+index_row.pack(anchor="w", padx=10)
+
+index_entry_label = tk.Label(index_row, text="덮어쓸 인덱스", state="disabled")
+index_entry_label.pack(side="left")
+
+index_entry = tk.Entry(index_row, width=10, state="disabled")
+index_entry.pack(side="left", padx=5)
+index_entry.config(disabledbackground="#2C2C2C", disabledforeground="#bbbbbb")
+
+
+################################
+# 전송 버튼 + 출력 → 가로정렬
+################################
+send_row = tk.Frame(root)
+send_row.pack(anchor="w", padx=10, pady=10)
+
+button = tk.Button(send_row, text="전송", command=send_request)
+button.pack(side="left")
+
+output = tk.Label(send_row, text="")
+output.pack(side="left", padx=10)
+
+
+################################
+# echoes
+################################
+separator = ttk.Separator(root, orient="horizontal")
+separator.pack(fill="x")
+
+get_button = tk.Button(root, text="GET", command=get_cumulative)
+get_button.pack(padx=10, pady=5, anchor="w")
+
+text_frame = tk.Frame(root)
+text_frame.pack(anchor="w", padx=10, pady=5, fill="both", expand=True)
+
+scrollbar = tk.Scrollbar(text_frame, orient="vertical")
+scrollbar.pack(side="right", fill="y")
+
+cumulative_output = tk.Text(
+  text_frame,
+  width=50,
+  height=0,
+  yscrollcommand=scrollbar.set,
+  bg="#333333", 
+  highlightthickness=0,
+)
+def block_edit(event):
+    return "break"
+cumulative_output.bind("<Key>", block_edit)
+cumulative_output.bind("<BackSpace>", block_edit)
+cumulative_output.bind("<Delete>", block_edit)
+cumulative_output.pack(side="left", fill="both", expand=True)
+
+scrollbar.config(command=cumulative_output.yview)
+
+root.protocol("WM_DELETE_WINDOW", on_close)
+root.mainloop()
