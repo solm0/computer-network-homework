@@ -84,3 +84,17 @@ status code 수정
 # 8
 - 서: sqlite만들기
 - 클: 
+
+
+# 9
+vps에서 서버계속돌아가게하기
+
+tmux 설치 `sudo apt install tmux`
+세션생성 `tmux new -s 세션이름`
+서버실행
+
+tmux 세션 다시 들어가기
+`tmux ls`
+`tmux attach -t 세션이름`
+
+서버 중지
