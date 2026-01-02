@@ -87,10 +87,11 @@ top_frame.pack(fill="x", padx=10, pady=10)
 method_frame = tk.Frame(top_frame)
 method_frame.pack(side="left", expand=True, fill="both")
 
-tk.Label(method_frame, text="http method를 선택하세요").pack(anchor="w")
+tk.Label(method_frame, text="HTTP method를 선택하세요").pack(anchor="w")
 def update_index_input():
   button.config(text=selected.get())
   output.config(text='')
+  cumulative_output.delete("1.0", "end")
 
   if selected.get() in ['POST', 'PUT', '???']:
     entry.config(state='normal')
@@ -104,7 +105,7 @@ tk.Radiobutton(method_frame, text="GET", value="GET", variable=selected, command
 tk.Radiobutton(method_frame, text="POST", value="POST", variable=selected, command=update_index_input).pack(anchor="w")
 tk.Radiobutton(method_frame, text="PUT",  value="PUT",  variable=selected, command=update_index_input).pack(anchor="w")
 tk.Radiobutton(method_frame, text="HEAD", value="HEAD", variable=selected, command=update_index_input).pack(anchor="w")
-tk.Radiobutton(method_frame, text="난 http를 거부하겠다",  value="???",  variable=selected, command=update_index_input).pack(anchor="w")
+tk.Radiobutton(method_frame, text="난 HTTP를 거부하겠다",  value="???",  variable=selected, command=update_index_input).pack(anchor="w")
 
 # --- path 영역 ---
 path_frame = tk.Frame(top_frame)
@@ -171,10 +172,12 @@ scrollbar.pack(side="right", fill="y")
 cumulative_output = tk.Text(
   text_frame,
   width=50,
-  height=0,
+  height=20,
   yscrollcommand=scrollbar.set,
-  bg="#333333", 
+  bg="#333333",
+  fg="#ffffff",
   highlightthickness=0,
+  tabs=("20p",)
 )
 def block_edit(event):
     return "break"

@@ -71,3 +71,10 @@ status code 수정
 - get,head with path
 
 - 모든 method의 버튼 하나로통일
+
+
+# 와이어샤크설치
+
+맥 ip주소 찾기
+- 로컬ip: `ipconfig getifaddr en0`
+- 공인ip: `curl ifconfig.me`
