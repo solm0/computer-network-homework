@@ -47,11 +47,11 @@ while True:
         status_code = '200'
         status_phrase = 'OK'
         
-        response_body = (
-          f"messages = ["
-          f"{'' if len(messages) < 1 else f"\r\n{"\r\n".join(f"\t{i}: {msg}" for i, msg in enumerate(messages))}\r\n"}"
-          f"]"
-        )
+        if messages:
+          inner = "\r\n".join(f"\t{i}: {msg}" for i, msg in enumerate(messages))
+          response_body = f"messages = [\r\n{inner}\r\n]"
+        else:
+          response_body = "messages = []"
       else:
         parts = path.strip("/").split("/")
         if parts[-1].isdigit():

@@ -78,3 +78,9 @@ status code 수정
 맥 ip주소 찾기
 - 로컬ip: `ipconfig getifaddr en0`
 - 공인ip: `curl ifconfig.me`
+
+
+
+# 8
+- 서: sqlite만들기
+- 클: 
