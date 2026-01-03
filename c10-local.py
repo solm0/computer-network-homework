@@ -3,7 +3,7 @@ from tkinter import ttk
 from socket import *
 
 serverName = '127.0.0.1'
-serverPort = 8080
+serverPort = 8081
 
 root = tk.Tk()
 root.title("v10")
