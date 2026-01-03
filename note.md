@@ -230,3 +230,14 @@ Accept-Encoding: gzip
 
 순서대로 프록시 테스트, 프록시 테스트, 취약 서버 스캔이라고 한다.
 vps ip는 이미 전세계 스캐너 db에 있어서 포트 8080 열리는 순간 프록시테스트,봇 등등이 접근 시도한다고.
+
+좀있다 와보니 또 서버가 죽어있다
+
+```
+Traceback (most recent call last):
+  File "/root/projects/2026/computer-network-homework/s10.py", line 73, in <module>
+    request = connectionSocket.recv(1024).decode()
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xeb in position 17: invalid continuation byte
+```
+
+UnicodeDecodeError 처리도 추가했다.

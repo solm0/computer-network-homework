@@ -11,10 +11,9 @@ serverSocket.bind((serverName, serverPort))
 serverSocket.listen(1)
 print('the server is ready to receive')
 
-# DB 준비
+# DB 초기화
 conn = sqlite3.connect("messages.db")
 cur = conn.cursor()
-
 cur.execute("""
 CREATE TABLE IF NOT EXISTS messages (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -68,32 +67,46 @@ def update_message(msg_id, guest, guestbook):
 
 # 메인 루프
 while True:
-  connectionSocket, addr = serverSocket.accept()
   try:
-    request = connectionSocket.recv(1024).decode()
-    if not request:
+    connectionSocket, addr = serverSocket.accept()
+  except Exception:
+    continue
+
+  connectionSocket.settimeout(5)
+
+  try:
+    data = connectionSocket.recv(1024)
+    if not data or b"\r\n\r\n" not in data:
       connectionSocket.close()
       continue
-  except ConnectionResetError:
+
+    try:
+      request = data.decode("utf-8")
+    except UnicodeDecodeError:
+      connectionSocket.close()
+      continue
+  except (ConnectionResetError, timeout):
     connectionSocket.close()
     continue
 
   print(f"\r\n{request}")
 
-  # http 메시지 파싱
-  if "\r\n\r\n" in request:
-    header, body = request.split("\r\n\r\n", 1)
-  else:
-    header, body = request, ""
-
+  # HTTP 파싱
+  header, body = request.split("\r\n\r\n", 1)
   lines = header.split("\r\n")
-  method, path, version = lines[0].split(" ")
+  parts = lines[0].split()
+
+  if len(parts) != 3:
+    connectionSocket.close()
+    continue
+
+  method, path, version = parts
 
   status_code = "200"
   status_phrase = "OK"
   response_body = ""
 
-  # 
+  # POST/PUT body 검증
   if method in ('POST', 'PUT'):
     if not body or "said:" not in body:
       status_code = '400'
@@ -182,7 +195,7 @@ while True:
     status_phrase = 'Method Not Allowed'
     response_body = "잘못된 method입니다."
   
-  # 답 전송
+  # 응답 전송
   response = (
     f"{version} {status_code} {status_phrase}\r\n"
     f"Server: MyHTTP/1.0\r\n"
@@ -192,5 +205,8 @@ while True:
     f"{response_body}"
   )
 
-  connectionSocket.send(response.encode())
+  try:
+    connectionSocket.sendall(response.encode())
+  except ConnectionResetError:
+    pass
   connectionSocket.close()
