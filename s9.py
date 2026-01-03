@@ -101,6 +101,7 @@ while True:
       status_code = '404'
       status_phrase = 'Not Found'
       response_body = "POST에는 index를 사용할 수 없습니다."
+      
   elif method == 'GET':
     if path == '/':
       rows = get_all_messages()
