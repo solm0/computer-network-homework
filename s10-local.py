@@ -1,7 +1,7 @@
 from socket import *
 import sqlite3
 
-serverName = '0.0.0.0'
+serverName = '127.0.0.1'
 serverPort = 8080
 
 # 서버 소켓 생성
