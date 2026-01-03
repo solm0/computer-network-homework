@@ -6,7 +6,7 @@ serverName = '158.247.200.157'
 serverPort = 8080
 
 root = tk.Tk()
-root.title("v8")
+root.title("v10")
 root.geometry("500x650")
 
 selected = tk.StringVar(value="POST")
@@ -28,7 +28,7 @@ def send_request():
   request_msg = (
     f"{method} {path} HTTP/1.1\r\n"
     f"Host: {serverName}\r\n"
-    f"User-Agent: AnArrayOfMessages/1.0\r\n"
+    f"User-Agent: HelloSocket/1.0\r\n"
     f"Accept: text/plain; charset=utf-8\r\n"
     f"Content-Length: {str(len(request_body.encode()))}\r\n"
     f"\r\n"
@@ -72,7 +72,7 @@ def on_close():
 
 
 
-header_title = tk.Label(root, text="An Array of Messages", font=("Helvetica", 18, "bold"))
+header_title = tk.Label(root, text="Hello Socket", font=("Helvetica", 18, "bold"))
 header_title.pack(padx=10, pady=10, anchor="w")
 
 ################################

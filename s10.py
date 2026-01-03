@@ -112,6 +112,7 @@ while True:
       status_code = '404'
       status_phrase = 'Not Found'
       response_body = "POST에는 index를 사용할 수 없습니다."
+
   elif method == 'GET':
     if path == '/':
       rows = get_all_messages()
@@ -126,7 +127,7 @@ while True:
         row = get_one_message(idx)
         if row:
           i, guest, guestbook = row
-          response_body = f"{i} | {guest} said: {guestbook}"
+          response_body = f"[{id}] '{guestbook}' - {guest}"
         else:
           status_code = "404"
           status_phrase = "Not Found"
