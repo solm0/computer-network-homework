@@ -4,7 +4,7 @@ import sqlite3
 serverName = '0.0.0.0'
 serverPort = 8080
 
-# 서버 소켓 생성
+# 서버 소켓 생성, listen
 serverSocket = socket(AF_INET, SOCK_STREAM)
 serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 serverSocket.bind((serverName, serverPort))
@@ -54,28 +54,31 @@ def get_one_message(msg_id):
   return row
 
 def update_message(msg_id, guest, guestbook):
-    conn = sqlite3.connect("messages.db")
-    cur = conn.cursor()
-    cur.execute(
-        "UPDATE messages SET guest=?, guestbook=? WHERE id=?",
-        (guest, guestbook, msg_id)
-    )
-    conn.commit()
-    changed = cur.rowcount
-    conn.close()
-    return changed > 0
+  conn = sqlite3.connect("messages.db")
+  cur = conn.cursor()
+  cur.execute(
+      "UPDATE messages SET guest=?, guestbook=? WHERE id=?",
+      (guest, guestbook, msg_id)
+  )
+  conn.commit()
+  changed = cur.rowcount
+  conn.close()
+  return changed > 0
 
 # 메인 루프
 while True:
   try:
+    # 커넥션 소켓 생성
     connectionSocket, addr = serverSocket.accept()
   except Exception:
     continue
 
   connectionSocket.settimeout(5)
 
+  # 소켓에서 데이터 받아오기
   try:
     data = connectionSocket.recv(1024)
+
     if not data or b"\r\n\r\n" not in data:
       connectionSocket.close()
       continue
@@ -91,7 +94,7 @@ while True:
 
   print(f"\r\n{request}")
 
-  # HTTP 파싱
+  # 헤더, 바디 파싱
   header, body = request.split("\r\n\r\n", 1)
   lines = header.split("\r\n")
   parts = lines[0].split()
@@ -106,18 +109,16 @@ while True:
   status_phrase = "OK"
   response_body = ""
 
-  # POST/PUT body 검증
-  if method in ('POST', 'PUT'):
+  # response message 구성, db 조작
+  if method == 'POST':
     if not body or "said:" not in body:
       status_code = '400'
       status_phrase = 'Bad Request'
       response_body = "invalid body"
 
-  if method == 'POST':
-    if path == '/':
+    elif path == '/':
       guest, guestbook = body.split("said:", 1)
       new_id = add_message(guest, guestbook)
-
       status_code = '201'
       status_phrase = 'Created'
       response_body = f"[{new_id}] '{guestbook}' - {guest}"
@@ -135,9 +136,11 @@ while True:
       )
     else:
       parts = path.strip("/").split("/")
+
       if parts[-1].isdigit():
         idx = int(parts[-1])
         row = get_one_message(idx)
+
         if row:
           id, guest, guestbook = row
           response_body = f"[{id}] '{guestbook}' - {guest}"
@@ -152,11 +155,13 @@ while True:
 
   elif method == 'HEAD':
     parts = path.strip("/").split("/")
+
     if path == "/":
       response_body = ""
     elif parts[-1].isdigit():
       idx = int(parts[-1])
       row = get_one_message(idx)
+
       if not row:
         status_code = "404"
         status_phrase = "Not Found"
@@ -167,35 +172,40 @@ while True:
     response_body = ""
 
   elif method == "PUT":
-    parts = path.strip("/").split("/")
-    if path == "/":
-      status_code = "405"
-      status_phrase = "Method Not Allowed"
-      response_body = "덮어쓰기할 index를 입력해 주세요."
-    elif parts[-1].isdigit():
-      idx = int(parts[-1])
-
-      guest, guestbook = body.split("said:", 1)
-      guest = guest.strip()
-      guestbook = guestbook.strip()
-
-      ok = update_message(idx, guest, guestbook)
-      if ok:
-        response_body = f"성공적으로 {idx}를 덮어쓰기했습니다."
-      else:
-        status_code = "404"
-        status_phrase = "Not Found"
-        response_body = "존재하지 않는 index입니다."
+    if not body or "said:" not in body:
+      status_code = '400'
+      status_phrase = 'Bad Request'
+      response_body = "invalid body"
     else:
-      status_code = "400"
-      status_phrase = "Bad Request"
-      response_body = "index는 정수여야 합니다."
+      parts = path.strip("/").split("/")
+      if path == "/":
+        status_code = "405"
+        status_phrase = "Method Not Allowed"
+        response_body = "덮어쓰기할 index를 입력해 주세요."
+      elif parts[-1].isdigit():
+        idx = int(parts[-1])
+
+        guest, guestbook = body.split("said:", 1)
+        guest = guest.strip()
+        guestbook = guestbook.strip()
+
+        ok = update_message(idx, guest, guestbook)
+        
+        if ok:
+          response_body = f"성공적으로 {idx}를 덮어쓰기했습니다."
+        else:
+          status_code = "404"
+          status_phrase = "Not Found"
+          response_body = "존재하지 않는 index입니다."
+      else:
+        status_code = "400"
+        status_phrase = "Bad Request"
+        response_body = "index는 정수여야 합니다."
   else:
     status_code = '405'
     status_phrase = 'Method Not Allowed'
     response_body = "잘못된 method입니다."
   
-  # 응답 전송
   response = (
     f"{version} {status_code} {status_phrase}\r\n"
     f"Server: MyHTTP/1.0\r\n"
@@ -205,8 +215,11 @@ while True:
     f"{response_body}"
   )
 
+  # response request 전송
   try:
     connectionSocket.sendall(response.encode())
   except ConnectionResetError:
     pass
+
+  # 커넥션 소켓 닫기
   connectionSocket.close()
