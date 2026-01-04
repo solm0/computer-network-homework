@@ -179,8 +179,8 @@ while True:
     else:
       parts = path.strip("/").split("/")
       if path == "/":
-        status_code = "405"
-        status_phrase = "Method Not Allowed"
+        status_code = "400"
+        status_phrase = "Bad Request"
         response_body = "덮어쓰기할 index를 입력해 주세요."
       elif parts[-1].isdigit():
         idx = int(parts[-1])
